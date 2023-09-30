@@ -35,10 +35,16 @@ Then go in the GLFW folder and write the commandes :
 ```
 
 # Install GLAD 
-Install <a href="https://glad.dav1d.de/">glad</a> from the website (check local files at the end of the page)
-Add glad to your project directory in the include folder.
+Install <a href="https://glad.dav1d.de/">glad</a> from the website (check local files at the end of the page).
+Unzip it and search for the glad folder inside.
+Add it to your project directory in the include folder.
 
-# Compileting
+# Install GLM
+Install <a href="https://github.com/g-truc/glm/tags">GLM</a> from the github repo, take the latest tag.
+Unzip it and search for the glm folder inside
+Add it to your project directory in the include folder.
+
+# Compiling
 To complie your best program you need to run the command :
 ``` bash
 	
@@ -52,3 +58,4 @@ If you get an error of permition, run the command :
 	chmod +x compile.sh
 
 ```
+

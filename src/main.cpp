@@ -1,11 +1,35 @@
 #include "../include/glad/glad.h"
 #include <GLFW/glfw3.h>
-
+#include "../include/glm/glm.hpp"
+#include "../include/glm/gtc/matrix_transform.hpp"
+#include "../include/glm/gtc/type_ptr.hpp"
 #include <iostream>
 
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 
 int main() {
+
+    // Test of GLM
+    // Instansiating a vector 4D
+    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    // Instansiating an identity matrix
+    /*
+        Identity matrix 
+        ---------
+        |1|0|0|0|
+        |0|1|0|0|
+        |0|0|1|0|
+        |0|0|0|1|
+        ---------
+    */
+    glm::mat4 trans = glm::mat4(1.0f);
+    // Making it an translation matrix
+    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    std::cout << "x : " << vec.x << std::endl << "y : " << vec.y << std::endl << "z : " << vec.z << std::endl; 
+    // Translating the vector with the translation matrix
+    vec = trans * vec;
+    std::cout << "x : " << vec.x << std::endl << "y : " << vec.y << std::endl << "z : " << vec.z << std::endl; 
+
     //Const variables
     const int WIDTH = 1000;
     const int HEIGHT = 800;
