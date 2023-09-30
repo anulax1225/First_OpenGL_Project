@@ -9,10 +9,10 @@ void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 
 int main() {
 
-    // Test of GLM
-    // Instansiating a vector 4D
+    //Test of GLM
+    //Instansiating a vector 4D
     glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    // Instansiating an identity matrix
+    //Instansiating an identity matrix
     /*
         Identity matrix 
         ---------
@@ -23,10 +23,13 @@ int main() {
         ---------
     */
     glm::mat4 trans = glm::mat4(1.0f);
-    // Making it an translation matrix
+    //Making it a translation rotation and scale matrix
     trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+    //Loging result
     std::cout << "x : " << vec.x << std::endl << "y : " << vec.y << std::endl << "z : " << vec.z << std::endl; 
-    // Translating the vector with the translation matrix
+    //Translating the vector with the translation matrix
     vec = trans * vec;
     std::cout << "x : " << vec.x << std::endl << "y : " << vec.y << std::endl << "z : " << vec.z << std::endl; 
 
