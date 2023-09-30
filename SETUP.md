@@ -24,7 +24,6 @@
 # Installing GLFW :
 
 Install source package for OpenGL from glfw.org/download.html
-
 Go to the GLFW folder and write commandes :
 ```bash
 
@@ -38,10 +37,3 @@ Install glad zip from the website (check local files at the end of the page)
 https://glad.dav1d.de/
 Add glad to your project directory
 
-# Compile :
-``` bash
-
-	g++ src/*.cpp include/glad/glad.c -o bin/prog -std=c++11 -Wall -lGL -lGLU -lglut -lGLEW -lglfw -lX11 -lXxf86vm -lXrandr -lpthread -lXi -ldl -lXinerama -lXcursor
-
-
-```
