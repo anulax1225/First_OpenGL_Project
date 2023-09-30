@@ -1,7 +1,7 @@
 # Project OpenGL
 
 ##  Setup 
-Follow the instructions in the <a href="setup.md">Setup file</a>.
+Follow the instructions in the <a href="./SETUP.md">Setup file</a>.
 
 ## Overview
 This project is a small project that i am making to learn OpenGL. The goal
