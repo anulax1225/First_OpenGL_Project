@@ -59,29 +59,29 @@ int main() {
 
     Shader shader = Shader("assets/shaders/vertex_core.glsl", "assets/shaders/fragment_core.glsl");
 
-    // // Creating a array of vertices to create triangle from them
-    // float vertices[] = {
-    //     0.5f, 0.5f, 0.0f, //top right
-    //     -0.5f, 0.5f, 0.0f, // top left
-    //     -0.5f, -0.5f, 0.0f,  //bottum left
-    //      0.5f, -0.5f, 0.0f, // bottum right
-    // };
-    // //Indices to draw the triangle from the vertices
-    // unsigned int indices[] = {
-    //     0, 1, 2, //first triangle
-    //     2, 3, 0, //second triangle
-    // };
+    // Creating a array of vertices to create a square from them
     float vertices[] = {
-        //position          color
-       -0.25f, -0.5f, 0.0f, 1.0f, 1.0f, 0.5f,
-        0.15f, 0.0f, 0.0f, 0.5f, 1.0f, 0.75f,
-        0.0f, 0.5f, 0.0f, 0.6f, 1.0f, 0.2f,
-        0.5f, -0.4f, 0.0f, 1.0f, 0.2f, 1.0f,
+        0.5f, 0.5f, 0.0f, //top right
+        -0.5f, 0.5f, 0.0f, // top left
+        -0.5f, -0.5f, 0.0f,  //bottum left
+         0.5f, -0.5f, 0.0f, // bottum right
     };
+    //Indices to draw the triangle from the vertices
     unsigned int indices[] = {
-        0, 1, 2,
-        3, 2, 1,
+        0, 1, 2, //first triangle
+        2, 3, 0, //second triangle
     };
+    // float vertices[] = {
+    //     //position          color
+    //    -0.25f, -0.5f, 0.0f, 1.0f, 1.0f, 0.5f,
+    //     0.15f, 0.0f, 0.0f, 0.5f, 1.0f, 0.75f,
+    //     0.0f, 0.5f, 0.0f, 0.6f, 1.0f, 0.2f,
+    //     0.5f, -0.4f, 0.0f, 1.0f, 0.2f, 1.0f,
+    // };
+    // unsigned int indices[] = {
+    //     0, 1, 2,
+    //     3, 2, 1,
+    // };
 
     //Creating VAO(vertex array object), VBO(vertex buffer object), EBO(element buffer object)
     unsigned int VAO, VBO, EBO;
