@@ -17,11 +17,13 @@ class Shader {
     public :
         //Shader id pointer
         unsigned int id;
+        Shader() = delete;
         Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath);
         void Activate();
         //Uniform variable functions
         void SetMat4(std::string name, glm::mat4 val);
         void SetInt(std::string name, int val);
+        void SetFloat(std::string name, float val);
     private :         
         //Utility functions
         std::string loadShaderSrc(const std::string path);

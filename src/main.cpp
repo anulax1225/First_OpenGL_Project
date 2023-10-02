@@ -9,11 +9,17 @@
 #include <string>
 
 #include "Shader.hpp"
-
+#include "io/Keyboard.hpp"
+#include "io/Mouse.hpp"
+#include "io/Joystick.hpp"
 
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 void ProcessInput(GLFWwindow* window);
-std::string loadShaderSrc(std::string path);
+
+float mixVal = 0.5f;
+
+glm::mat4 mouseTransform = glm::mat4(1.0f);
+Joystick mainJ = Joystick(0);
 
 int main() {
 
@@ -57,16 +63,21 @@ int main() {
     glViewport( 0, 0, WIDTH, HEIGHT);
     //Sets behavior when window is resized
     glfwSetFramebufferSizeCallback(window, FrameBufferSizeCallback);
+    //Other callbacks
+    glfwSetKeyCallback(window, Keyboard::KeyboardCallback);
+    glfwSetCursorPosCallback(window, Mouse::CursorPosCallback);
+    glfwSetMouseButtonCallback(window, Mouse::MouseButtonCallback);
+    glfwSetScrollCallback(window, Mouse::MouseWheelCallback);
 
     Shader shader = Shader("assets/shaders/vertex_core.glsl", "assets/shaders/fragment_core.glsl");
 
     // Creating a array of vertices to create a square from them
     float vertices[] = {
         //position(3)        color(3)       texture cordinates(2)
-        0.7f, 0.7f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f,//top right
-        -0.7f, 0.7f, 0.0f, 0.5f, 1.0f, 0.75f, 0.0f, 1.0f,// top left
-        -0.7f, -0.7f, 0.0f, 0.6f, 1.0f, 0.2f, 0.0f, 0.0f, //bottum left
-        0.7f, -0.7f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f, 0.0f,// bottum right
+        0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f,//top right
+        -0.5f, 0.5f, 0.0f, 0.5f, 1.0f, 0.75f, 0.0f, 1.0f,// top left
+        -0.5f, -0.5f, 0.0f, 0.6f, 1.0f, 0.2f, 0.0f, 0.0f, //bottum left
+        0.5f, -0.5f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f, 0.0f,// bottum right
     };
     //Indices to draw the triangle from the vertices
     unsigned int indices[] = {
@@ -145,6 +156,11 @@ int main() {
 
     stbi_image_free(data);
 
+    mainJ.Update();
+    if(mainJ.IsPresent()) {
+        std::cout << "DUALSHOCK " << mainJ.GetName() << std::endl;
+    }
+
     shader.Activate();
     shader.SetInt("texture1", 0);
     shader.SetInt("texture2", 1);
@@ -160,10 +176,12 @@ int main() {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);      
 
-        //Update transforme matrix
-        shader.Activate();
         //Get basique user input to close the window
-        ProcessInput(window);    
+        ProcessInput(window);  
+        shader.Activate();
+        shader.SetFloat("mixVal", mixVal);
+        //Update transforme matrix
+        shader.SetMat4("transform", mouseTransform);  
         //Draw shapes
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -188,7 +206,42 @@ void FrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 void ProcessInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    if (Keyboard::KeyDown(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
     }
-}
+    if (mainJ.ButtonState(JOYSTICK_BTN_UP) == GLFW_PRESS) {
+        mixVal += 0.05f;
+        if (mixVal > 1) {
+            mixVal = 1.0f;
+        }
+    }
+    if (mainJ.ButtonState(JOYSTICK_BTN_DOWN) == GLFW_PRESS) {
+        mixVal -= 0.05f;
+        if (mixVal < 0) {
+            mixVal = 0.0f;
+        }
+    }
+    // if (Keyboard::KeyDown(GLFW_KEY_UP)) {
+    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(0.0f,-0.1f,0.0f));
+    // }
+    // if (Keyboard::KeyDown(GLFW_KEY_DOWN)) {
+    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(0.0f,0.1f,0.0f));
+    // }
+    // if (Keyboard::KeyDown(GLFW_KEY_LEFT)) {
+    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(0.1f,0.0f,0.0f));
+    // }
+    // if (Keyboard::KeyDown(GLFW_KEY_RIGHT)) {
+    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(-0.1f,0.0f,0.0f));
+    // }
+    mainJ.Update();
+
+    float lx = mainJ.AxesState(JOYSTICK_AXES_LEFT_STICK_X);
+    float ly = -mainJ.AxesState(JOYSTICK_AXES_LEFT_STICK_Y);
+
+    if (std::abs(lx) > 0.1f) {
+        mouseTransform = glm::translate(mouseTransform, glm::vec3(lx/10.0f, 0.0f, 0.0f));
+    }
+    if (std::abs(ly) > 0.1f) {
+        mouseTransform = glm::translate(mouseTransform, glm::vec3(0.0f, ly / 10.0f, 0.0f));
+    }
+} 
