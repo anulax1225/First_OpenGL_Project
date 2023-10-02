@@ -21,6 +21,7 @@ class Shader {
         void Activate();
         //Uniform variable functions
         void SetMat4(std::string name, glm::mat4 val);
+        void SetInt(std::string name, int val);
     private :         
         //Utility functions
         std::string loadShaderSrc(const std::string path);

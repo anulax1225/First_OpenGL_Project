@@ -3,11 +3,12 @@
 #include "../lib/glm/glm.hpp"
 #include "../lib/glm/gtc/matrix_transform.hpp"
 #include "../lib/glm/gtc/type_ptr.hpp"
+#include "../lib/stb_image/stb_image.h"
 
 #include <iostream>
 #include <string>
 
-#include "../include/Shader.hpp"
+#include "Shader.hpp"
 
 
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -61,27 +62,17 @@ int main() {
 
     // Creating a array of vertices to create a square from them
     float vertices[] = {
-        0.5f, 0.5f, 0.0f, //top right
-        -0.5f, 0.5f, 0.0f, // top left
-        -0.5f, -0.5f, 0.0f,  //bottum left
-         0.5f, -0.5f, 0.0f, // bottum right
+        //position(3)        color(3)       texture cordinates(2)
+        0.7f, 0.7f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f,//top right
+        -0.7f, 0.7f, 0.0f, 0.5f, 1.0f, 0.75f, 0.0f, 1.0f,// top left
+        -0.7f, -0.7f, 0.0f, 0.6f, 1.0f, 0.2f, 0.0f, 0.0f, //bottum left
+        0.7f, -0.7f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f, 0.0f,// bottum right
     };
     //Indices to draw the triangle from the vertices
     unsigned int indices[] = {
         0, 1, 2, //first triangle
-        2, 3, 0, //second triangle
+        0, 2, 3, //second triangle
     };
-    // float vertices[] = {
-    //     //position          color
-    //    -0.25f, -0.5f, 0.0f, 1.0f, 1.0f, 0.5f,
-    //     0.15f, 0.0f, 0.0f, 0.5f, 1.0f, 0.75f,
-    //     0.0f, 0.5f, 0.0f, 0.6f, 1.0f, 0.2f,
-    //     0.5f, -0.4f, 0.0f, 1.0f, 0.2f, 1.0f,
-    // };
-    // unsigned int indices[] = {
-    //     0, 1, 2,
-    //     3, 2, 1,
-    // };
 
     //Creating VAO(vertex array object), VBO(vertex buffer object), EBO(element buffer object)
     unsigned int VAO, VBO, EBO;
@@ -97,33 +88,80 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     //Set attribute pointer
-    //Indicates to the GPU how to distribute the data
-    //Weird cast to a void pointer for OpenGL
+    //Indicates to the GPU how to segment and distribute the data in the VBO
+    //(id, number of values, type of values, normelized: false, size of a unit, offset)
+    //Cast to a void pointer on the offset for OpenGL
     //position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,  6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,  8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     //color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,  6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,  8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
+    //texture
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2); 
 
     //Set up the EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glm::mat4 transform = glm::mat4(1.0f);
+    //Creating texture reference
+    unsigned int texture1, texture2;
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+    //Parameterising the last bound texture
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    //Loading the image
+    int width, height, nChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load("assets/textures/salomon.jpeg", &width, &height, &nChannels, 0);
+
+    if(data) {
+        //Loads the image data in the last bound texture 
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "Could not load image" << std::endl;
+    }
     
+    stbi_image_free(data);
+
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    data = stbi_load("assets/textures/index.png", &width, &height, &nChannels, 0);
+
+    if(data) {
+        //Loads the image data in the last bound texture 
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        std::cout << "Could not load image" << std::endl;
+    }
+
+    stbi_image_free(data);
+
+    shader.Activate();
+    shader.SetInt("texture1", 0);
+    shader.SetInt("texture2", 1);
 
     //Main loop
     while(!glfwWindowShouldClose(window)) {
         //Gives the background color
         glClearColor(0.1f,0.4f,1.0f,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);        
+        glClear(GL_COLOR_BUFFER_BIT);  
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);      
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);      
 
         //Update transforme matrix
-        transform = glm::rotate(transform, glm::radians((float)glfwGetTime()/50.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         shader.Activate();
-        shader.SetMat4("transform", transform);
         //Get basique user input to close the window
         ProcessInput(window);    
         //Draw shapes
