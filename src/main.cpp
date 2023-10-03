@@ -16,16 +16,15 @@
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 void ProcessInput(GLFWwindow* window);
 
-float mixVal = 0.5f;
+int WIDTH = 800;
+int HEIGHT = 600;
 
-glm::mat4 mouseTransform = glm::mat4(1.0f);
+float mixVal = 0.5f;
+float x,y,z;
+
 Joystick mainJ = Joystick(0);
 
 int main() {
-
-    //Const variables
-    const int WIDTH = 800;
-    const int HEIGHT = 600;
 
     //Init of middleware
     glfwInit();
@@ -69,27 +68,70 @@ int main() {
     glfwSetMouseButtonCallback(window, Mouse::MouseButtonCallback);
     glfwSetScrollCallback(window, Mouse::MouseWheelCallback);
 
+    glEnable(GL_DEPTH_TEST);
+
     Shader shader = Shader("assets/shaders/vertex_core.glsl", "assets/shaders/fragment_core.glsl");
 
-    // Creating a array of vertices to create a square from them
+    // // Creating a array of vertices to create a square from them
+    // float vertices[] = {
+    //     //position(3)        color(3)       texture cordinates(2)
+    //     0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f,//top right
+    //     -0.5f, 0.5f, 0.0f, 0.5f, 1.0f, 0.75f, 0.0f, 1.0f,// top left
+    //     -0.5f, -0.5f, 0.0f, 0.6f, 1.0f, 0.2f, 0.0f, 0.0f, //bottum left
+    //     0.5f, -0.5f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f, 0.0f,// bottum right
+    // };
+    // //Indices to draw the triangle from the vertices
+    // unsigned int indices[] = {
+    //     0, 1, 2, //first triangle
+    //     0, 2, 3, //second triangle
+    // };
     float vertices[] = {
-        //position(3)        color(3)       texture cordinates(2)
-        0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f,//top right
-        -0.5f, 0.5f, 0.0f, 0.5f, 1.0f, 0.75f, 0.0f, 1.0f,// top left
-        -0.5f, -0.5f, 0.0f, 0.6f, 1.0f, 0.2f, 0.0f, 0.0f, //bottum left
-        0.5f, -0.5f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f, 0.0f,// bottum right
-    };
-    //Indices to draw the triangle from the vertices
-    unsigned int indices[] = {
-        0, 1, 2, //first triangle
-        0, 2, 3, //second triangle
-    };
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
     //Creating VAO(vertex array object), VBO(vertex buffer object), EBO(element buffer object)
-    unsigned int VAO, VBO, EBO;
+    unsigned int VAO, VBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     //Binding VAO
     glBindVertexArray(VAO);
@@ -103,18 +145,11 @@ int main() {
     //(id, number of values, type of values, normelized: false, size of a unit, offset)
     //Cast to a void pointer on the offset for OpenGL
     //position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,  8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,  5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    //color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,  8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
     //texture
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2); 
-
-    //Set up the EBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1); 
 
     //Creating texture reference
     unsigned int texture1, texture2;
@@ -165,26 +200,38 @@ int main() {
     shader.SetInt("texture1", 0);
     shader.SetInt("texture2", 1);
 
+    x = 0.0f;
+    y = 0.0f;
+    z = 3.0f;
+
     //Main loop
     while(!glfwWindowShouldClose(window)) {
         //Gives the background color
         glClearColor(0.1f,0.4f,1.0f,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);  
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);      
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);      
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
 
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f, 0.5f, 0.0f));
+        view = glm::translate(view, glm::vec3(-x, -y, -z));
+        projection = glm::perspective(glm::radians(45.0f), (float)WIDTH/(float)HEIGHT, 0.1f, 100.f);
         //Get basique user input to close the window
         ProcessInput(window);  
         shader.Activate();
         shader.SetFloat("mixVal", mixVal);
         //Update transforme matrix
-        shader.SetMat4("transform", mouseTransform);  
+        shader.SetMat4("model", model);
+        shader.SetMat4("view", view);
+        shader.SetMat4("projection", projection);
         //Draw shapes
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
         //Swaps the image buffer for the next one
         glfwSwapBuffers(window);
@@ -195,7 +242,6 @@ int main() {
     //Once finished termenate the window and delete the data from the GPU
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
     glfwTerminate();
     return 0;
 }
@@ -203,23 +249,13 @@ int main() {
 //Resizes the view port when user changes the screen size
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
+    WIDTH = width;
+    HEIGHT = height;
 }
 
 void ProcessInput(GLFWwindow* window) {
     if (Keyboard::KeyDown(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
-    }
-    if (mainJ.ButtonState(JOYSTICK_BTN_UP) == GLFW_PRESS) {
-        mixVal += 0.05f;
-        if (mixVal > 1) {
-            mixVal = 1.0f;
-        }
-    }
-    if (mainJ.ButtonState(JOYSTICK_BTN_DOWN) == GLFW_PRESS) {
-        mixVal -= 0.05f;
-        if (mixVal < 0) {
-            mixVal = 0.0f;
-        }
     }
     // if (Keyboard::KeyDown(GLFW_KEY_UP)) {
     //     mouseTransform = glm::translate(mouseTransform, glm::vec3(0.0f,-0.1f,0.0f));
@@ -239,9 +275,22 @@ void ProcessInput(GLFWwindow* window) {
     float ly = -mainJ.AxesState(JOYSTICK_AXES_LEFT_STICK_Y);
 
     if (std::abs(lx) > 0.1f) {
-        mouseTransform = glm::translate(mouseTransform, glm::vec3(lx/10.0f, 0.0f, 0.0f));
+        x += lx / 10;
     }
     if (std::abs(ly) > 0.1f) {
-        mouseTransform = glm::translate(mouseTransform, glm::vec3(0.0f, ly / 10.0f, 0.0f));
+        z -= ly / 10;
+    }
+
+    if (mainJ.ButtonState(JOYSTICK_BTN_UP) == GLFW_PRESS) {
+            mixVal += 0.05f;
+        if (mixVal > 1) {
+            mixVal = 1.0f;
+        }
+    }
+    if (mainJ.ButtonState(JOYSTICK_BTN_DOWN) == GLFW_PRESS) {
+        mixVal -= 0.05f;
+        if (mixVal < 0) {
+            mixVal = 0.0f;
+        }
     }
 } 
