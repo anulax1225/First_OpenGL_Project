@@ -19,7 +19,7 @@ bool Mouse::buttonsChanged[GLFW_MOUSE_BUTTON_LAST] = { 0 };
 
 void Mouse::CursorPosCallback(GLFWwindow* window, double _x, double _y) {
     x = _x;
-    y = _y;
+    y = -_y;
 
     if(firstMouse) {
         lastX = x;

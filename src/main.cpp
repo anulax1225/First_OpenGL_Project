@@ -12,6 +12,7 @@
 #include "io/Keyboard.hpp"
 #include "io/Mouse.hpp"
 #include "io/Joystick.hpp"
+#include "io/Camera.hpp"
 
 void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
 void ProcessInput(GLFWwindow* window);
@@ -20,9 +21,13 @@ int WIDTH = 800;
 int HEIGHT = 600;
 
 float mixVal = 0.5f;
-float x,y,z;
+
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
 
 Joystick mainJ = Joystick(0);
+
+Camera camera = Camera(glm::vec3(0.0f,0.0f,3.0f));
 
 int main() {
 
@@ -68,23 +73,12 @@ int main() {
     glfwSetMouseButtonCallback(window, Mouse::MouseButtonCallback);
     glfwSetScrollCallback(window, Mouse::MouseWheelCallback);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     glEnable(GL_DEPTH_TEST);
 
     Shader shader = Shader("assets/shaders/vertex_core.glsl", "assets/shaders/fragment_core.glsl");
 
-    // // Creating a array of vertices to create a square from them
-    // float vertices[] = {
-    //     //position(3)        color(3)       texture cordinates(2)
-    //     0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.5f, 1.0f, 1.0f,//top right
-    //     -0.5f, 0.5f, 0.0f, 0.5f, 1.0f, 0.75f, 0.0f, 1.0f,// top left
-    //     -0.5f, -0.5f, 0.0f, 0.6f, 1.0f, 0.2f, 0.0f, 0.0f, //bottum left
-    //     0.5f, -0.5f, 0.0f, 1.0f, 0.2f, 1.0f, 1.0f, 0.0f,// bottum right
-    // };
-    // //Indices to draw the triangle from the vertices
-    // unsigned int indices[] = {
-    //     0, 1, 2, //first triangle
-    //     0, 2, 3, //second triangle
-    // };
     float vertices[] = {
 		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -191,21 +185,15 @@ int main() {
 
     stbi_image_free(data);
 
-    mainJ.Update();
-    if(mainJ.IsPresent()) {
-        std::cout << "DUALSHOCK " << mainJ.GetName() << std::endl;
-    }
-
     shader.Activate();
     shader.SetInt("texture1", 0);
     shader.SetInt("texture2", 1);
 
-    x = 0.0f;
-    y = 0.0f;
-    z = 3.0f;
-
     //Main loop
     while(!glfwWindowShouldClose(window)) {
+        float currentTime = glfwGetTime();
+        deltaTime = currentTime - lastFrame;
+        lastFrame = currentTime;
         //Gives the background color
         glClearColor(0.1f,0.4f,1.0f,1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
@@ -219,8 +207,8 @@ int main() {
         glm::mat4 projection = glm::mat4(1.0f);
 
         model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f, 0.5f, 0.0f));
-        view = glm::translate(view, glm::vec3(-x, -y, -z));
-        projection = glm::perspective(glm::radians(45.0f), (float)WIDTH/(float)HEIGHT, 0.1f, 100.f);
+        view = camera.GetViewMatrix();
+        projection = glm::perspective(glm::radians(camera.zoom), (float)WIDTH/(float)HEIGHT, 0.1f, 100.f);
         //Get basique user input to close the window
         ProcessInput(window);  
         shader.Activate();
@@ -257,40 +245,32 @@ void ProcessInput(GLFWwindow* window) {
     if (Keyboard::KeyDown(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
     }
-    // if (Keyboard::KeyDown(GLFW_KEY_UP)) {
-    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(0.0f,-0.1f,0.0f));
-    // }
-    // if (Keyboard::KeyDown(GLFW_KEY_DOWN)) {
-    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(0.0f,0.1f,0.0f));
-    // }
-    // if (Keyboard::KeyDown(GLFW_KEY_LEFT)) {
-    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(0.1f,0.0f,0.0f));
-    // }
-    // if (Keyboard::KeyDown(GLFW_KEY_RIGHT)) {
-    //     mouseTransform = glm::translate(mouseTransform, glm::vec3(-0.1f,0.0f,0.0f));
-    // }
-    mainJ.Update();
-
-    float lx = mainJ.AxesState(JOYSTICK_AXES_LEFT_STICK_X);
-    float ly = -mainJ.AxesState(JOYSTICK_AXES_LEFT_STICK_Y);
-
-    if (std::abs(lx) > 0.1f) {
-        x += lx / 10;
+    if (Keyboard::KeyDown(GLFW_KEY_W)) {
+        camera.UpdateCameraPosition(CameraDirection::FORWARD, deltaTime);
     }
-    if (std::abs(ly) > 0.1f) {
-        z -= ly / 10;
+    if (Keyboard::KeyDown(GLFW_KEY_S)) {
+        camera.UpdateCameraPosition(CameraDirection::BACKWARD, deltaTime);
+    }
+    if (Keyboard::KeyDown(GLFW_KEY_A)) {
+        camera.UpdateCameraPosition(CameraDirection::LEFT, deltaTime);
+    }
+    if (Keyboard::KeyDown(GLFW_KEY_D)) {
+        camera.UpdateCameraPosition(CameraDirection::RIGHT, deltaTime);
+    }
+    if (Keyboard::KeyDown(GLFW_KEY_LEFT_SHIFT)) {
+        camera.UpdateCameraPosition(CameraDirection::DOWN, deltaTime);
+    }
+    if (Keyboard::KeyDown(GLFW_KEY_SPACE)) {
+        camera.UpdateCameraPosition(CameraDirection::UP, deltaTime);
     }
 
-    if (mainJ.ButtonState(JOYSTICK_BTN_UP) == GLFW_PRESS) {
-            mixVal += 0.05f;
-        if (mixVal > 1) {
-            mixVal = 1.0f;
-        }
+    double dx = Mouse::GetDX(), dy = Mouse::GetDY();
+    if (dx != 0 || dy != 0) {
+        camera.UpdateCameraDirection(dx, dy);
     }
-    if (mainJ.ButtonState(JOYSTICK_BTN_DOWN) == GLFW_PRESS) {
-        mixVal -= 0.05f;
-        if (mixVal < 0) {
-            mixVal = 0.0f;
-        }
+
+    double scrollDy = Mouse::GetScrollDY();
+    if(scrollDy != 0) {
+        camera.UpdateCameraZoom(scrollDy);
     }
 } 
