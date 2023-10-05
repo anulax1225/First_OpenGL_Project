@@ -5,7 +5,7 @@ Camera::Camera(glm::vec3 position) {
     this->worldUp = glm::vec3(0.0f, 1.0f, 0.0f);
     this->yaw = -90.0f;
     this->pitch = 0.0f;
-    this->speed = 2.5f;
+    this->Speed = 2.5f;
     this->zoom = 45.0f;
     this->cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     this->sensitivity = 0.1f;
@@ -22,7 +22,7 @@ void Camera::UpdateCameraDirection(double dx, double dy) {
 }
 
 void Camera::UpdateCameraPosition(CameraDirection dir, double dt) {
-    float velocity = (float)dt * this->speed;
+    float velocity = (float)dt * this->Speed;
 
     switch(dir) {
         case CameraDirection::FORWARD:
@@ -48,7 +48,7 @@ void Camera::UpdateCameraPosition(CameraDirection dir, double dt) {
     }
 }
 
-void Camera::UpdateCameraZoom(double dy) {
+void Camera::SetZoom(double dy) {
     if(this->zoom >= 1.0f && this->zoom <= 45.0f) {
         this->zoom -= dy;
     }
@@ -58,6 +58,26 @@ void Camera::UpdateCameraZoom(double dy) {
     else {
         this->zoom = 45.0f;
     }
+}
+
+float Camera::GetZoom() {
+    return this->zoom; 
+}
+
+void Camera::SetSensitivity(float sensi) {
+    this->sensitivity = sensi;
+}
+
+float Camera::GetSensitvity() {
+    return this->sensitivity;
+}
+
+glm::vec3 Camera::GetPosition() {
+    return glm::vec3(this->cameraPos);
+}
+
+glm::vec3 Camera::GetFront() {
+    return glm::vec3(this->cameraFront);
 }
 
 glm::mat4 Camera::GetViewMatrix() {

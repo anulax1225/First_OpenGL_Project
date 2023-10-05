@@ -16,6 +16,21 @@ enum class CameraDirection {
 
 class Camera  {
     public:
+        float Speed;
+        Camera(glm::vec3 position);
+        //Modifiers
+        void UpdateCameraDirection(double dx, double dy);
+        void UpdateCameraPosition(CameraDirection dir, double dt);
+        void SetZoom(double dy);
+        void SetSensitivity(float sensi);
+        //Assesors
+        float GetZoom();
+        float GetSensitvity();
+        glm::vec3 GetPosition();
+        glm::vec3 GetFront();
+        glm::mat4 GetViewMatrix();
+
+    private:
         glm::vec3 cameraPos;
         glm::vec3 cameraFront;
         glm::vec3 cameraUp;
@@ -25,19 +40,8 @@ class Camera  {
 
         float yaw;
         float pitch;
-        float speed;
         float zoom;
         float sensitivity;
-
-        Camera(glm::vec3 position);
-
-        void UpdateCameraDirection(double dx, double dy);
-        void UpdateCameraPosition(CameraDirection dir, double dt);
-        void UpdateCameraZoom(double dy);
-
-        glm::mat4 GetViewMatrix();
-
-    private:
         void updateCameraVectors();    
 };
 

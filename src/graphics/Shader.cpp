@@ -1,7 +1,12 @@
 #include "Shader.hpp"
 
+Shader::Shader() {}
 
-Shader::Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath){
+Shader::Shader(const std::string vertexShaderPath, const std::string fragmentShaderPath) { 
+    this->Generate(vertexShaderPath, fragmentShaderPath);
+}
+
+void Shader::Generate(const std::string vertexShaderPath, const std::string fragmentShaderPath) {
     int success;
     char infoLog[512];
 
@@ -68,14 +73,38 @@ std::string Shader::loadShaderSrc(std::string path) {
     return shaderCode;
 }
 
-void Shader::SetMat4(std::string name, glm::mat4 val) {
-     glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(val));
+void Shader::Cleanup() {
+    glDeleteProgram(this->id);
 }
 
-void Shader::SetInt(std::string name, int val) {
+void Shader::SetInt(const std::string name, int val) {
     glUniform1i(glGetUniformLocation(this->id, name.c_str()), val);
 }
 
-void Shader::SetFloat(std::string name, float val) {
+void Shader::SetBool(const std::string name, bool value) {
+    glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
+}
+
+void Shader::SetFloat(const std::string name, float val) {
     glUniform1f(glGetUniformLocation(this->id, name.c_str()), val);
+}
+
+void Shader::Set3Float(const std::string name, float v1, float v2, float v3) {
+    glUniform3f(glGetUniformLocation(id, name.c_str()), v1, v2, v3);
+}
+
+void Shader::Set3Float(const std::string name, glm::vec3 v) {
+    this->Set3Float(name, v.x, v.y, v.z);
+}
+
+void Shader::Set4Float(const std::string name, float v1, float v2, float v3, float v4) {
+    glUniform4f(glGetUniformLocation(id, name.c_str()), v1, v2, v3, v4);
+}
+
+void Shader::SetMat3(const std::string name, glm::mat3 val) {
+     glUniformMatrix3fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(val));
+}
+
+void Shader::SetMat4(const std::string name, glm::mat4 val) {
+     glUniformMatrix4fv(glGetUniformLocation(this->id, name.c_str()), 1, GL_FALSE, glm::value_ptr(val));
 }
