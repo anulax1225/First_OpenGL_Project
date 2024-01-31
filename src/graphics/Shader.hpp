@@ -1,11 +1,10 @@
 #ifndef __SHADER_H__
 #define __SHADER_H__
 
-#include "../../lib/glad/glad.h"
-
-#include "../../lib/glm/glm.hpp"
-#include "../../lib/glm/gtc/matrix_transform.hpp"
-#include "../../lib/glm/gtc/type_ptr.hpp"
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 #include <string>

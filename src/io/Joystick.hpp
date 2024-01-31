@@ -1,7 +1,7 @@
 #ifndef __JOYSTICK_H__
 #define __JOYSTICK_H__
 
-#include "../../lib/glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 // analog input	button values				//		PS		|		XBOX

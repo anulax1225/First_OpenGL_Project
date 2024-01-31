@@ -1,9 +1,9 @@
-#include "../lib/glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../lib/glm/glm.hpp"
-#include "../lib/glm/gtc/matrix_transform.hpp"
-#include "../lib/glm/gtc/type_ptr.hpp"
-#include "../lib/stb_image/stb_image.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <stb_image/stb_image.h>
 
 #include <iostream>
 #include <string>

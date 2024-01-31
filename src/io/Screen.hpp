@@ -1,7 +1,7 @@
 #ifndef __SCREEN_H__
 #define __SCREEN_H__
 
-#include "../../lib/glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <string>

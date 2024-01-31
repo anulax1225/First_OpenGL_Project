@@ -1,7 +1,7 @@
 #ifndef __MATERIAL_H__
 #define __MATERIAL_H__
 
-#include "../../lib/glm/glm.hpp"
+#include <glm/glm.hpp>
 
 /*
     material structure to contain lighting values for different materials

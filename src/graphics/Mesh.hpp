@@ -1,9 +1,9 @@
 #ifndef __MESH_H__
 #define __MESH_H__
 
-#include "../../lib/glad/glad.h"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "../../lib/glm/glm.hpp"
+#include <glm/glm.hpp>
 
 #include <vector>
 
